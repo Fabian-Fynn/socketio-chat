@@ -2,6 +2,9 @@
   "name": "socket.io-chat",
   "version": "0.0.3",
   "main": "index.js",
+  "scripts": {
+    "build": "npm run clean && npm run setup && npm run build:scripts && npm run build:styles"
+    },
   "dependencies": {
     "express": "^4.10.2",
     "jsdom": "^4.0.4",
