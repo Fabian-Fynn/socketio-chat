@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Socket Chat</title>
+  <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; background: #000; margin: 20px; color: #fff; text-align: center;}
+      input { border: 0; padding: 10px; width: 100%; margin-right: .5%; }
+      button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px;  color: #000;}
+      h1 { margin-bottom: 20px;}
+      #messages { background: #333; list-style-type: none; margin: 0; padding: 0; width: 500px; height: 500px; color: #aaa;text-align: left;}
+      #messages li { padding: 5px 10px;  }
+      #login { width:225px; margin: 20% auto;}
+      #login h2 { margin-bottom: 5px;}
+      #messageContainer { margin: auto; width: 500px;}
+      #send { width: 50px; margin:0;}
+      #text { width: 450px; margin:0; margin-right: -4px;}
+      .server { font-style: italic; color: #777;}
+      #crafters { position: absolute; bottom: 10px; width: 100% ; text-align: center;}
+    </style>
+</head>
+
+<body>
+  <h1>Awesome Socket.io Chat</h1>
+  <div id="login">
+    <h2>Please enter Username</h2>
+    <input id="user" type="text" autofocus/>
+    <input id="connect" type="submit" value="Connect"/>
+  </div>
+  <div id="messageContainer">
+    <ul id="messages"></ul>
+    <input id="text" type="text" />
+    <button id="send" type="submit">Send</button>
+  </div>
+  <div id="crafters"> Fabian Hoffmann | Simon Hintersonnleitner </div>
+
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.2.js"></script>
+
+  <script>
+
+    var username;
+    $(function(){
+      $('#messageContainer').hide();
+    })
+    var socket = io();
+
+
+    $('#connect').click(function(){
+      if ( $('#user').val() != '') {
+        connect();
+      }
+    });
+
+    $('#user').on('keyup', function(event) {
+      if(event.which == 13 && $('#user').val() != '') {
+        connect();
+      }
+    });
+
+    function connect() {
+      username = $('#user').val();
+      $('#messageContainer').show();
+      $('#login').hide();
+      socket.emit('login', username);
+      $('#messages li').remove();
+      $('#text').focus();
+    }
+
+    $('#send').click(function(){
+      if ( $('#text').val() != '') {
+        say();
+      }
+      return false;
+    });
+
+    $('#text').on('keyup', function(event) {
+      if(event.which == 13 && $('#text').val() != '') {
+        say();
+      }
+    });
+
+    function say() {
+      var data = {
+        user: username,
+        msg: $('#text').val()
+      }
+      socket.emit('chat message', data);
+      $('#text').val('');
+      $('#text').focus();
+    }
+    socket.on('user-login', function(user){
+      if(user != username)
+        $('#messages').append($('<li class="server">').text(user + ' entered the room'));
+    });
+    socket.on('user-disconnect', function(user){
+      if(user != username)
+        $('#messages').append($('<li class="server">').text(user + ' has left the room '));
+    });
+    socket.on('chat message', function(data){
+      $('#messages').append($('<li>').text(data.user + ': ' + data.msg));
+      console.log(data.msg);
+    });
+  </script>
+</body>
+
+</html>
