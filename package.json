@@ -3,7 +3,9 @@
   "version": "0.0.3",
   "main": "index.js",
   "scripts": {
-    "build": "npm run clean && npm run setup && npm run build:scripts && npm run build:styles"
+    "clean": "rm -rf ./dist",
+    "copy": "mkdir ./dist && cp package.json ./dist/package.json && cp app/*.js ./dist && cp app/*.html ./dist",
+    "build": "npm run clean && npm run copy"
     },
   "dependencies": {
     "express": "^4.10.2",
